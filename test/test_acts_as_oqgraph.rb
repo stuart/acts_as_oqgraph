@@ -192,4 +192,11 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
      assert_equal [@test_3] , @test_2.outgoing_nodes
    end
    
+   def test_duplicate_links_ignored
+     @test_1.create_edge_to @test_2
+     assert_nothing_raised do
+       @test_1.create_edge_to @test_2 
+     end
+   end
+    
 end

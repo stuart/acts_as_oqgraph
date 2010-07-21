@@ -88,7 +88,8 @@ class GraphEdge < ActiveRecord::Base
     def add_to_graph
       connection.execute <<-EOS
         INSERT INTO #{oqgraph_table_name} (origid, destid, weight) 
-        VALUES (#{self.send(self.class.from_key)}, #{self.send(self.class.to_key)}, #{weight || 1.0});
+        VALUES (#{self.send(self.class.from_key)}, #{self.send(self.class.to_key)}, #{weight || 1.0})
+        ON DUPLICATE KEY UPDATE origid=#{self.send(self.class.from_key)};
       EOS
     end
 

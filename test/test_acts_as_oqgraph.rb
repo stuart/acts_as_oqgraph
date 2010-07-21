@@ -198,5 +198,20 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
        @test_1.create_edge_to @test_2
      end
    end
+   
+   def test_duplicate_link_error
+    ActiveRecord::Base.connection.execute("INSERT INTO test_model_oqgraph (destid, origid, weight) VALUES (99,99,1.0);")   
+    assert_raises ActiveRecord::StatementInvalid do
+      ActiveRecord::Base.connection.execute("INSERT INTO test_model_oqgraph (destid, origid, weight) VALUES (99,99,1.0);")
+    end
+   end
+   
+   def test_duplicate_link_error_fix
+    ActiveRecord::Base.connection.execute("REPLACE INTO test_model_oqgraph (destid, origid, weight) VALUES (99,99,1.0);")   
+    assert_nothing_raised do
+      ActiveRecord::Base.connection.execute("REPLACE INTO test_model_oqgraph (destid, origid, weight) VALUES (99,99,1.0);")
+    end
+   end
+   
     
 end

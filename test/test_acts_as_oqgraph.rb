@@ -66,6 +66,12 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
     assert_equal CustomEdge, CustomTestModel.edge_class
   end
   
+  def test_custom_keys
+    assert_equal 'dest_id', CustomEdge.to_key
+    assert_equal 'orig_id', CustomEdge.from_key
+    assert_equal 'length', CustomEdge.weight_column
+  end
+  
   def test_test_model_edge_creation
     @test_1.create_edge_to(@test_2)
     assert_not_nil edge = TestModelEdge.find(:first, :conditions => {:from_id => @test_1.id, :to_id => @test_2.id, :weight => 1.0})

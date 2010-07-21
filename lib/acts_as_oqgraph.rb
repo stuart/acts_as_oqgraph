@@ -75,7 +75,7 @@ module OQGraph
         oqgraph_table_name = options[:oqgraph_table_name] || "#{self.name}Oqgraph".underscore  
         from_key = options[:from_key] || 'from_id'
         to_key = options[:to_key]   || 'to_id' 
-        
+        weight_column = options[:weight_column] || 'weight'
         # Create the Edge Model
         eval <<-EOS
           class ::#{class_name} < ::GraphEdge
@@ -84,12 +84,13 @@ module OQGraph
             belongs_to :from, :class_name => '#{self.name}', :foreign_key => '#{from_key}'
             belongs_to :to, :class_name => '#{self.name}', :foreign_key => '#{to_key}'
             
-            cattr_accessor :node_class, :oqgraph_table_name, :to_key, :from_key 
+            cattr_accessor :node_class, :oqgraph_table_name, :to_key, :from_key, :weight_column
             
             @@oqgraph_table_name = '#{oqgraph_table_name}'
             @@from_key = '#{from_key}'
             @@to_key = '#{to_key}'
             @@node_class = #{self}
+            @@weight_column = '#{weight_column}'
             
             create_graph_table
           end

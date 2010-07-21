@@ -1,4 +1,4 @@
-*ActsAsOQGraph*
+= ActsAsOQGraph
 
 This gem can be used with ActiveRecord to access the features of the OQGraph
 MySQL plugin. 
@@ -11,7 +11,7 @@ pros and cons of both approaches, It really depends on your needs. Both librarie
 use the C++ Boost graph library at the bottom layers. OQGraph has expensive 
 insert operations but is very fast at delivering the graph data and finding paths in a single SQL query.
 
-*Concepts*
+== Concepts
 
 The term graph we are using here is a mathematical one not a pretty picture (sorry designers). 
 For more see: http://en.wikipedia.org/wiki/Graph_(mathematics) 
@@ -24,7 +24,7 @@ one each way between each node.
 Edges can be assigned positive floating point values called weights. Weights default to 1.0
 The weights are used in shortest path calculations, a path is shorter if the sum of weights over each edge is smaller.
 
-*What you can do with OQGraph?*
+== What you can do with OQGraph?
 
 Imagine your shiny new social networking app, FarceBook.
 You have lots and lots of users each with several friends. How do you find the friends of friends?
@@ -43,9 +43,9 @@ and I get the whole tree of friends of friends etc...
              
 Imagine you have a maze to solve. With OQGraph the solution is as simple as: start_cell.shortest_path_to(finish_cell).
 
-It's good for representing tree structures, networks, routes between cities, roads etc.
+It's good for representing tree structures, networks, routes between cities etc.
 
-*Usage*
+== Usage
 
 In your node model file:
 
@@ -53,8 +53,8 @@ In your node model file:
     acts_as_oqgraph
     end
 
-*Options*
-
+== Options
+  Given in a hash appended to the acts_as_oqgrpah call.
 * class_name - The name of the edge class, defaults to current class name appended with Edge. eg FooEdge
 * table_name - The name of the edge table, defaults to table name of the specified class, eg foo_edges
 * oqgraph_table_name - the name of the volatile oqgraph table. Default foo_edge_oqgraph
@@ -62,7 +62,7 @@ In your node model file:
 * to_key - The to key field in the edge table. Default: 'to_id'
 * weight_column - The weight field in the edge table.
 
-*Setup*
+== Setup
 
 This gem requires the use of MySQL or MariaDB with the OQGraph engine plugin.
 For details of this see: http://openquery.com/products/graph-engine
@@ -85,9 +85,9 @@ The associations are:
   edge_model.from
 
 
-*Examples of use*
+= Examples of Use
 
-Creating edges:
+=== Creating edges:
  foo.create_edge_to(bar) 
  foo.create_edge_to_and_from(bar)
 
@@ -105,7 +105,7 @@ Removing a edge:
  foo.remove_edge_from(bar)
 Note that these calls remove ALL edges to bar from foo
 
-Examining edges: 
+=== Examining edges: 
 
 What nodes point to this one?
 Gives us an array of nodes that are connected to this one in the inward (from) direction.
@@ -119,14 +119,20 @@ Includes the node calling the method.
  bar.reachable
  foo.reachable?(baz)
 
-Path Finding:
+=== Path Finding:
   foo.shortest_path_to(baz)
    returns [foo, bar,baz]
+  
+  The shortest path to can take a :method which can either be :dijikstra (the default)
+  or :breadth_first. The breadth first method does not take weights into account.
+  It is faster in some cases.
+  
+  foo.shortest_path_to(baz, :method => :breadth_first)
 
 All these methods return the node object with an additional weight field.
 This enables you to query the weights associated with the edges found.
 
-*Behind the Scenes*
+== Behind the Scenes
 
 When you declare acts_as_oqgraph then the edge class gets created. You can add extra functionality
 if you wish to the edge class by the usual Ruby monkey patching methods.
@@ -137,6 +143,22 @@ When your application starts up it will put all the edges into the graph table a
 they are created, deleted or modified. This could slow things down at startup but caching classes in production
 means it does not happen on every request. I will add functionality to only update the oqgraph table if the 
 db server has been stopped, once I figure out the best way to do it.
-    
+
+== Hairy bits, bugs and gotchas
+
+To keep the oqgraph table up to date the edge model copies all of it records in when first instantiated.
+This means that if you do not have
+  config.cache_classes = true
+in your environment and you have a lot of nodes your app will be dog slow. Also the app will be slow to start at first if
+there are many nodes even when caches are cached.
+
+I've encountered a bug where the oqgraph table occasionally needs to be dropped and rebuilt. It's being tracked down.
+If you are not getting any results from the oqgrah table try dropping it and restarting the app.
+
+I'm working on a way to tell if the oqgraph table is stale. Suggestions would be welcome.
+
+There is a method 'in_edges' in the edge model class. This does not currently work. 'out_edges' does.
+
+This gem is very new, the API is liable to change until it stabilises.
 
 Copyright (c) 2010 Stuart Coyle, released under the MIT license

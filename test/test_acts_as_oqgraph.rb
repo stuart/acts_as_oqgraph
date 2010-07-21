@@ -195,7 +195,7 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
    def test_duplicate_links_ignored
      @test_1.create_edge_to @test_2
      assert_nothing_raised do
-       @test_1.create_edge_to @test_2 
+       @test_1.create_edge_to @test_2
      end
    end
     

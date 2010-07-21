@@ -51,6 +51,7 @@ In your node model file:
     end
 
 *Options*
+
 * class_name - The name of the edge class, defaults to current class name appended with Edge. eg FooEdge
 * table_name - The name of the edge table, defaults to table name of the specified class, eg foo_edges
 * oqgraph_table_name - the name of the volatile oqgraph table. Default foo_edge_oqgraph
@@ -59,6 +60,7 @@ In your node model file:
 * weight_column - The weight field in the edge table.
 
 *Setup*
+
 This gem requires the use of MySQL or MariaDB with the OQGraph engine plugin.
 For details of this see: http://openquery.com/products/graph-engine
 
@@ -70,7 +72,6 @@ You will need a table for the edges with the following schema:
   end   
 The field names and table name can be changed via the options listed above.
 You should be able also to extend the edge model as you wish.
-
 The gem will automatically create the oqgraph table and the associations to it from your node model.
 The associations are:
   node_model.outgoing_edges
@@ -79,14 +80,15 @@ The associations are:
   node_model.incoming_nodes
   edge_model.to
   edge_model.from
-  
+
+
 *Examples of use*
 
 Creating edges:
  foo.create_edge_to(bar) 
  foo.create_edge_to_and_from(bar)
 
-Alternate notation using ActiveRecord associations: 
+Edge creation using ActiveRecord associations: 
  foo.outgoing_nodes << bar
 or equivalently:
   bar.incoming_nodes << foo
@@ -122,6 +124,7 @@ All these methods return the node object with an additional weight field.
 This enables you to query the weights associated with the edges found.
 
 *Behind the Scenes*
+
 When you declare acts_as_oqgraph then the edge class gets created. You can add extra functionality
 if you wish to the edge class by the usual Ruby monkey patching methods.
 

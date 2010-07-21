@@ -84,6 +84,8 @@ module OQGraph
             belongs_to :from, :class_name => '#{self.name}', :foreign_key => '#{from_key}'
             belongs_to :to, :class_name => '#{self.name}', :foreign_key => '#{to_key}'
             
+            cattr_accessor :node_class, :oqgraph_table_name, :to_key, :from_key 
+            
             @@oqgraph_table_name = '#{oqgraph_table_name}'
             @@from_key = '#{from_key}'
             @@to_key = '#{to_key}'

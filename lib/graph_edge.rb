@@ -6,7 +6,6 @@ class GraphEdge < ActiveRecord::Base
   after_destroy :remove_from_graph
   after_update  :update_graph
   
-  cattr_accessor :node_class, :oqgraph_table_name, :to_key, :from_key
   
   # Creates the OQgraph table if it does not exist.
   # Deletes all entries if it does exist and then repopulates with 

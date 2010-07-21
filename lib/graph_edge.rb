@@ -85,13 +85,14 @@ class GraphEdge < ActiveRecord::Base
     node_class.find_by_sql select_for_node << sql 
   end
    
-  private
     def add_to_graph
       connection.execute <<-EOS
         INSERT INTO #{oqgraph_table_name} (origid, destid, weight) 
         VALUES (#{self.send(self.class.from_key)}, #{self.send(self.class.to_key)}, #{weight || 1.0});
       EOS
     end
+
+private
 
     def remove_from_graph
       connection.execute <<-EOS

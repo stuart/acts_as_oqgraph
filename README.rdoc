@@ -12,6 +12,7 @@ use the C++ Boost graph library at the bottom layers. OQGraph has expensive
 insert operations but is very fast at delivering the graph data and finding paths in a single SQL query.
 
 *Concepts*
+
 The term graph we are using here is a mathematical one not a pretty picture (sorry designers). 
 For more see: http://en.wikipedia.org/wiki/Graph_(mathematics) 
 A graph consists of nodes (aka vertices) connected by edges (aka links, paths). 
@@ -23,7 +24,8 @@ one each way between each node.
 Edges can be assigned positive floating point values called weights. Weights default to 1.0
 The weights are used in shortest path calculations, a path is shorter if the sum of weights over each edge is smaller.
 
-*What you can do with OQGraph*
+*What you can do with OQGraph?*
+
 Imagine your shiny new social networking app, FarceBook.
 You have lots and lots of users each with several friends. How do you find the friends of friends?
 Or even the friends of friends of friends...right up to the six degrees of separation perhaps?
@@ -44,6 +46,7 @@ Imagine you have a maze to solve. With OQGraph the solution is as simple as: sta
 It's good for representing tree structures, networks, routes between cities, roads etc.
 
 *Usage*
+
 In your node model file:
 
   Class Foo < ActiveRecord::Base

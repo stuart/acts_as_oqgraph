@@ -53,14 +53,22 @@ In your node model file:
     acts_as_oqgraph
     end
 
-== Options
-  Given in a hash appended to the acts_as_oqgrpah call.
+=== Options
+Given in a hash appended to the acts_as_oqgrpah call.
+
+   acts_as_oqgraph :class_name => 'FooLinks', 
+                   :table_name => "my_foo_links", 
+                   :oqgraph_table_name => 'foo_oqgraph', 
+                   :from_key => 'origin', 
+                   :to_key => 'dest'
+                   :weight_column => 'weight'
+                   
 * class_name - The name of the edge class, defaults to current class name appended with Edge. eg FooEdge
 * table_name - The name of the edge table, defaults to table name of the specified class, eg foo_edges
 * oqgraph_table_name - the name of the volatile oqgraph table. Default foo_edge_oqgraph
 * from_key - The from key field in the edge table. Default 'from_id'
 * to_key - The to key field in the edge table. Default: 'to_id'
-* weight_column - The weight field in the edge table.
+* weight_column - The weight field in the edge table. Default: weight
 
 == Setup
 

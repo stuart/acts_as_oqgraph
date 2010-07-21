@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "acts_as_oqgraph"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{Use the Open Query Graph engine with Active Record}
+    gem.description = %Q{Acts As OQGraph allows ActiveRecord models to use the fast ans powerful OQGraph engine for MYSQL.}
     gem.email = "stuart.coyle@gmail.com"
     gem.homepage = "http://github.com/stuart/acts_as_oqgraph"
     gem.authors = ["Stuart Coyle"]
@@ -20,7 +20,7 @@ end
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
   test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/test_*.rb'
+  test.pattern = 'test/test_*.rb'
   test.verbose = true
 end
 
@@ -46,7 +46,7 @@ Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "acts_as_oqgraph #{version}"
+  rdoc.title = "testy #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end

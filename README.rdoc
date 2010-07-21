@@ -1,17 +1,137 @@
-= acts_as_oqgraph
+ActsAsOQGraph
+===========
+This gem can be used with ActiveRecord to access the features of the OQGraph
+MySQL plugin. 
 
-Description goes here.
+Please take a look at the Open Query Graph engine page at http://openquery.com/products/graph-engine
 
-== Note on Patches/Pull Requests
+This provides fast graph operations on the database. It does a similar thing to the 
+acts_as_graph gem, which does all the graph work on the application server. There are 
+pros and cons of both approaches, It really depends on your needs. Both libraries 
+use the C++ Boost graph library at the bottom layers. OQGraph has expensive 
+insert operations but is very fast at delivering the graph data and finding paths in a single SQL query.
+
+Concepts:
+The term graph we are using here is a mathematical one not a pretty picture (sorry designers). 
+For more see: http://en.wikipedia.org/wiki/Graph_(mathematics) 
+A graph consists of nodes (aka vertices) connected by edges (aka edges). 
+In a directed graph an edge has a direction. That is, it has an 'from' node and and a 'to' node.
+When tracing a path on the graph you can only go in the direction of the edge.
+The OQGraph gem operates on directed graphs. To create a non directed graph you have to create two edges,
+one each way between each node.     
+
+Edges can be assigned positive floating point values called weights. Weights default to 1.0
+The weights are used in shortest path calculations, a path is shorter if the sum of weights over each edge is smaller.
+
+What you can do with OQGraph:
+Imagine your shiny new social networking app, FarceBook.
+You have lots and lots of users each with several friends. How do you find the friends of friends?
+Or even the friends of friends of friends...right up to the six degrees of separation perhaps?
+
+Well you can do it, with some really slow and nasty SQL queries. Relational databases are good at set
+based queries but no good at graph or tree based queries. The OQGraph engine is good at graph based queries, 
+it enables you in one simple SQL query to find all friends of friends. 
+    Do this: user.reachable
+    If you really want to you can rename the reachable method so you can do this in your User model:
+             alias friends, reachable
+    Then I can call: 
+             user.friends
+    and I get the whole tree of friends of friends etc...
+             
+    TODO: Perhaps I should hook into ActiveRecord associations somehow so these can be named associations instead of methods.
+          Not really sure of how to go about this as yet
+          .
+Imagine you have a maze to solve. With OQGraph the solution is as simple as: start_cell.shortest_path_to(finish_cell).
+
+It's good for representing tree structures, networks, routes between cities, roads etc.
+
+Usage:
+
+Class Foo < ActiveRecord::Base
+    acts_as_oqgraph +options+
+end
+
+Options: 
+:class_name - The name of the edge class, defaults to current class name appended with Edge. eg FooEdge
+:table_name - The name of the edge table, defaults to table name of the specified class, eg foo_edges
+:oqgraph_table_name - the name of the volatile oqgraph table. Default foo_edge_oqgraph
+:from_key - The from key field in the edge table. Default 'from_id'
+:to_key - The to key field in the edge table. Default: 'to_id'
+:weight_column - The weight field in the edge table.
+
+Setup:
+This gem requires the use of MySQL or MariaDB with the OQGraph engine plugin.
+For details of this see: http://openquery.com/products/graph-engine
+
+You will need a table for the edges with the following schema:
+  create_table foo_edges do |t|
+      t.integer from_id
+      t.integer to_id
+      t.double weight
+  end   
+The field names and table name can be changed via the options listed above.
+You should be able also to extend the edge model as you wish.
+
+The gem will automatically create the oqgraph table and the associations to it from your node model.
+The associations are:
+  node_model.outgoing_edges
+  node_model.incoming_edges
+  node_model.outgoing_nodes
+  node_model.incoming_nodes
+  edge_model.to
+  edge_model.from
+  
+Examples of use:
+
+Creating edges:
+ foo.create_edge_to(bar) 
+ foo.create_edge_to_and_from(bar)
+
+Alternate notation using ActiveRecord associations: 
+ foo.outgoing_nodes << bar
+or equivalently:
+  bar.incoming_nodes << foo
+At the moment you cannot add weights to edges with this style of notation.
+
+Create a edge with weight:
+ bar.create_edge_to(baz, 2.0)
  
-* Fork the project.
-* Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
-* Send me a pull request. Bonus points for topic branches.
+Removing a edge:
+ foo.remove_edge_to(bar)
+ foo.remove_edge_from(bar)
+Note that these calls remove ALL edges to bar from foo
 
-== Copyright
+Examining edges: 
 
-Copyright (c) 2010 Stuart Coyle. See LICENSE for details.
+What nodes point to this one?
+Gives us an array of nodes that are connected to this one in the inward (from) direction.
+Includes the node calling the method.
+ foo.originating
+ bar.originating?(baz)
+
+What nodes can I reach from this one?
+Gives us an array of nodes that are connected to this one in the outward (to) direction.
+Includes the node calling the method.
+ bar.reachable
+ foo.reachable?(baz)
+
+Path Finding:
+  foo.shortest_path_to(baz)
+   returns [foo, bar,baz]
+
+All these methods return the node object with an additional weight field.
+This enables you to query the weights associated with the edges found.
+
+Behind the Scenes:
+When you declare acts_as_oqgraph then the edge class gets created. You can add extra functionality
+if you wish to the edge class by the usual Ruby monkey patching methods.
+
+The OQGraph table will also get created if it does not exist. The OQGraph table is volatile, it holds data in 
+memory only. The table structure is not volatile and gets stored in the db. 
+When your application starts up it will put all the edges into the graph table and update them as
+they are created, deleted or modified. This could slow things down at startup but caching classes in production
+means it does not happen on every request. I will add functionality to only update the oqgraph table if the 
+db server has been stopped, once I figure out the best way to do it.
+    
+
+Copyright (c) 2010 Stuart Coyle, released under the MIT license

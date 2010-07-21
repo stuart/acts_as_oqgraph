@@ -152,6 +152,26 @@ they are created, deleted or modified. This could slow things down at startup bu
 means it does not happen on every request. I will add functionality to only update the oqgraph table if the 
 db server has been stopped, once I figure out the best way to do it.
 
+== How fast is it?
+I've tested with an application with 10000 nodes and 0 to 9 links from each.
+
+For a node connected to most of the network finding all reachable nodes averages at about 300ms.
+This is strongly dependent on how well connected the graph is.
+
+To find shortest paths between nodes takes about 5 to 10ms per request.
+Here's an example request: 
+  Processing OqgraphUsersController#show_path (for 127.0.0.1 at 2010-07-21 17:09:59) [GET]
+  Parameters: {"id"=>"223", "other_id"=>"2333"}
+    OqgraphUser Load (0.3ms)   SELECT * FROM `oqgraph_users` WHERE (`oqgraph_users`.`id` = 223) 
+    OqgraphUser Load (0.1ms)   SELECT * FROM `oqgraph_users` WHERE (`oqgraph_users`.`id` = 2333) 
+    OqgraphUser Load (2.2ms)   SELECT oqgraph_users.id,oqgraph_users.first_name,oqgraph_users.last_name, oqgraph_user_oqgraph.weight FROM oqgraph_user_oqgraph     JOIN oqgraph_users ON (linkid=id) WHERE latch = 1 AND origid = 223 AND destid = 2333
+    ORDER BY seq;     
+
+  Rendering oqgraph_users/show_path
+  Completed in 6ms (View: 2, DB: 3) | 200 OK [http://localhost/oqgraph_users/223/path_to/2333]
+
+Of course YMMV.
+
 == Hairy bits, bugs and gotchas
 
 To keep the oqgraph table up to date the edge model copies all of it records in when first instantiated.

@@ -219,5 +219,12 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
     end
    end
    
+   def test_deletion_of_nonexistent_edge_raises_error
+     edge = @test_1.create_edge_to @test_2
+     ActiveRecord::Base.connection.execute("DELETE FROM test_model_oqgraph WHERE destid = #{edge.to_id} AND origid = #{edge.from_id}")
+     assert_raises ActiveRecord::StatementInvalid do
+       edge.destroy
+     end
+   end
     
 end

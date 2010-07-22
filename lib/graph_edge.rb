@@ -94,9 +94,10 @@ class GraphEdge < ActiveRecord::Base
 private
 
     def remove_from_graph
-      connection.execute <<-EOS
-        DELETE FROM #{oqgraph_table_name} WHERE origid = #{self.send(self.class.from_key)} AND destid = #{self.send(self.class.to_key)};
-      EOS
+      # Ignores trying to delete nonexistent records
+       connection.execute <<-EOS
+          DELETE IGNORE FROM #{oqgraph_table_name} WHERE origid = #{self.send(self.class.from_key)} AND destid = #{self.send(self.class.to_key)};
+       EOS
     end
 
     def update_graph

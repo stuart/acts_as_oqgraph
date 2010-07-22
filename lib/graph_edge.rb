@@ -27,7 +27,7 @@ class GraphEdge < ActiveRecord::Base
      EOS
     
     connection.execute <<-EOS
-      INSERT INTO #{oqgraph_table_name} (origid, destid, weight) 
+      REPLACE INTO #{oqgraph_table_name} (origid, destid, weight) 
       SELECT #{from_key}, #{to_key}, #{weight_column} FROM #{table_name}
       EOS
   end   

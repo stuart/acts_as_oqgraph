@@ -2,7 +2,6 @@ require 'helper'
 
 class TestActsAsOqgraph < ActiveSupport::TestCase
   def setup
-    
     ActiveRecord::Base.establish_connection(
         :adapter  => "mysql",
         :host     => "localhost",
@@ -13,8 +12,9 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
     
     ActiveRecord::Base.connection.execute("CREATE TABLE IF NOT EXISTS test_models(id INTEGER DEFAULT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) );")
     ActiveRecord::Base.connection.execute("CREATE TABLE IF NOT EXISTS test_model_edges(id INTEGER DEFAULT NULL AUTO_INCREMENT PRIMARY KEY, from_id INTEGER, to_id INTEGER, weight DOUBLE);")
-    ActiveRecord::Base.connection.execute("CREATE TABLE IF NOT EXISTS custom_edges(id INTEGER DEFAULT NULL AUTO_INCREMENT PRIMARY KEY, from_id INTEGER, to_id INTEGER, weight DOUBLE);")
+    ActiveRecord::Base.connection.execute("CREATE TABLE IF NOT EXISTS custom_edges(id INTEGER DEFAULT NULL AUTO_INCREMENT PRIMARY KEY, orig_id INTEGER, dest_id INTEGER, length DOUBLE);")
     
+    # These requires need the tables to be created.
     require File.join(File.dirname(__FILE__),'models/custom_test_model')
     require File.join(File.dirname(__FILE__),'models/test_model')
     
@@ -24,7 +24,6 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
     @test_4 = TestModel.create(:name => 'd')
     @test_5 = TestModel.create(:name => 'e')
     @test_6 = TestModel.create(:name => 'f')
-    
   end
 
   def teardown
@@ -33,7 +32,6 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
     ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS custom_edges;")
     ActiveRecord::Base.connection.execute("DELETE FROM test_model_oqgraph;") 
     ActiveRecord::Base.connection.execute("DELETE FROM custom_test_model_oqgraph;") 
-    
   end
   
   def test_edge_table_and_class_names
@@ -70,6 +68,11 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
     assert_equal 'dest_id', CustomEdge.to_key
     assert_equal 'orig_id', CustomEdge.from_key
     assert_equal 'length', CustomEdge.weight_column
+    mysql = Mysql.new('localhost', 'root', '', 'test')
+    fields = mysql.list_fields('custom_edges').fetch_fields.map{|f| f.name}
+    assert fields.include?('orig_id')
+    assert fields.include?('dest_id')
+    assert fields.include?('length')
   end
   
   def test_test_model_edge_creation
@@ -222,7 +225,7 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
    def test_deletion_of_nonexistent_edge_raises_error
      edge = @test_1.create_edge_to @test_2
      ActiveRecord::Base.connection.execute("DELETE FROM test_model_oqgraph WHERE destid = #{edge.to_id} AND origid = #{edge.from_id}")
-     assert_raises ActiveRecord::StatementInvalid do
+     assert_nothing_raised do
        edge.destroy
      end
    end

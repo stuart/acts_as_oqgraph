@@ -60,7 +60,10 @@ module OQGraph
       # Path Finding:
       #   foo.shortest_path_to(baz)
       #    returns [foo, bar,baz]
-      # 
+      #
+      # With breadth first edge weights are not taken into account:
+      #  foo.shortest_path_to(baz, :method => :breadth_first)
+      #
       # All these methods return the node object with an additional weight field.
       # This enables you to query the weights associated with the edges found.
       # 
@@ -139,9 +142,7 @@ module OQGraph
           end
           return result
         rescue ActiveRecord::StatementInvalid => e
-          # This will occur if the table is not using MySQL
-          # TODO: Raise a sensible error message here.
-          return false
+          raise "MySQL or MariaDB 5.1 or above with the OQGRAPH engine is required for the acts_as_oqgraph gem.\nThe following error was raised: #{e.inspect}"
         end    
       end
     end
@@ -178,7 +179,7 @@ module OQGraph
       
       # Returns an array of all nodes which can trace to this node
       def originating
-        edge_class.originating_vertices(self)
+        edge_class.originating_nodes(self)
       end
       
       # true if the other node can reach this node.
@@ -188,7 +189,7 @@ module OQGraph
       
       # Returns all nodes reachable from this node.
       def reachable
-        edge_class.reachable_vertices(self)
+        edge_class.reachable_nodes(self)
       end
       
       # true if the other node is reachable from this one

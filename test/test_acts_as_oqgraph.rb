@@ -134,7 +134,7 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
   end
   
   def test_getting_shortest_path_more_complex
-    #
+    # 
     # a -- b -- c -- d
     #      |      / 
     #      e-- f 
@@ -222,6 +222,7 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
     end
    end
    
+   # There's an odd case here where MySQL would raise an error only when using Rails.
    def test_deletion_of_nonexistent_edge_raises_error
      edge = @test_1.create_edge_to @test_2
      ActiveRecord::Base.connection.execute("DELETE FROM test_model_oqgraph WHERE destid = #{edge.to_id} AND origid = #{edge.from_id}")
@@ -229,5 +230,5 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
        edge.destroy
      end
    end
-    
+   
 end

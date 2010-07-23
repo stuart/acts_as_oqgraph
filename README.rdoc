@@ -42,6 +42,7 @@ Then I can call:
 and I get the whole tree of friends of friends etc...
              
 Imagine you have a maze to solve. With OQGraph the solution is as simple as: start_cell.shortest_path_to(finish_cell).
+See the demo code at http://github.com/stuart/acts_as_oqgraph_demo
 
 It's good for representing tree structures, networks, routes between cities etc.
 

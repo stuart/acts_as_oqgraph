@@ -15,8 +15,8 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
     ActiveRecord::Base.connection.execute("CREATE TABLE IF NOT EXISTS custom_edges(id INTEGER DEFAULT NULL AUTO_INCREMENT PRIMARY KEY, orig_id INTEGER, dest_id INTEGER, length DOUBLE);")
     
     # These requires need the tables to be created.
-    require File.join(File.dirname(__FILE__),'models/custom_test_model')
-    require File.join(File.dirname(__FILE__),'models/test_model')
+    require File.join(File.expand_path(File.dirname(__FILE__)),"models/custom_test_model")
+    require File.join(File.expand_path(File.dirname(__FILE__)),"models/test_model")
     
     @test_1 = TestModel.create(:name => 'a')
     @test_2 = TestModel.create(:name => 'b')

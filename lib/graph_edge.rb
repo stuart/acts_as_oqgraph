@@ -7,29 +7,28 @@ class GraphEdge < ActiveRecord::Base
   after_update  :update_graph
   
   # Creates the OQgraph table if it does not exist.
-  # Deletes all entries if it does exist and then repopulates with 
-  # current edges. TODO: Optimise this so that it only does so if the 
-  # DB server has been restarted rather than when the app is restarted.
   def self.create_graph_table
-    connection.execute "DROP TABLE IF EXISTS #{oqgraph_table_name}"
+        
+      connection.execute <<-EOS
+      CREATE TABLE IF NOT EXISTS #{oqgraph_table_name} (
+          latch   SMALLINT  UNSIGNED NULL,
+          origid  BIGINT    UNSIGNED NULL,
+          destid  BIGINT    UNSIGNED NULL,
+          weight  DOUBLE    NULL,
+          seq     BIGINT    UNSIGNED NULL,
+          linkid  BIGINT    UNSIGNED NULL,
+          KEY (latch, origid, destid) USING HASH,
+          KEY (latch, destid, origid) USING HASH
+        ) ENGINE=OQGRAPH;
+       EOS
     
-    connection.execute <<-EOS
-    CREATE TABLE IF NOT EXISTS #{oqgraph_table_name} (
-        latch   SMALLINT  UNSIGNED NULL,
-        origid  BIGINT    UNSIGNED NULL,
-        destid  BIGINT    UNSIGNED NULL,
-        weight  DOUBLE    NULL,
-        seq     BIGINT    UNSIGNED NULL,
-        linkid  BIGINT    UNSIGNED NULL,
-        KEY (latch, origid, destid) USING HASH,
-        KEY (latch, destid, origid) USING HASH
-      ) ENGINE=OQGRAPH;
-     EOS
-    
-    connection.execute <<-EOS
-      REPLACE INTO #{oqgraph_table_name} (origid, destid, weight) 
-      SELECT #{from_key}, #{to_key}, #{weight_column} FROM #{table_name}
-      EOS
+    # if the DB server has restarted then there will be no records in the oqgraph table.
+    if connection.select_value("SELECT COUNT(*) FROM #{oqgraph_table_name}") == 0
+      connection.execute <<-EOS
+        REPLACE INTO #{oqgraph_table_name} (origid, destid, weight) 
+        SELECT #{from_key}, #{to_key}, #{weight_column} FROM #{table_name}
+        EOS
+    end                   
   end   
   
   # Returns the shortest path from node to node.
@@ -75,7 +74,7 @@ class GraphEdge < ActiveRecord::Base
   
   # Finds the edges leading directly into the node
   # FIXME: Note this currently does not work.
-  # I suspect a bug in OQGRaph engine.
+  # I suspect a bug in OQGraph engine.
   # Using the node classes incoming_nodes is equivalent to this.
   def self.in_edges(node)
     sql = <<-EOS

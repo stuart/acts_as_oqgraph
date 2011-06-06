@@ -6,7 +6,7 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "acts_as_oqgraph"
     gem.summary = %Q{Use the Open Query Graph engine with Active Record}
-    gem.description = %Q{Acts As OQGraph allows ActiveRecord models to use the fast ans powerful OQGraph engine for MYSQL.}
+    gem.description = %Q{Acts As OQGraph allows ActiveRecord models to use the fast and powerful OQGraph engine for MYSQL.}
     gem.email = "stuart.coyle@gmail.com"
     gem.homepage = "http://github.com/stuart/acts_as_oqgraph"
     gem.authors = ["Stuart Coyle"]

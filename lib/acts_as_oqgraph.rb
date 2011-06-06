@@ -36,7 +36,9 @@ module OQGraph
       # The field names and table name can be changed via the options listed above.
       #
       # The gem will automatically create the oqgraph table.
-      # 
+      # To rebuild the oqgraph table do:
+      #       Model.rebuild_graph
+      #
       # Examples of use:
       # 
       # Creating and removing edges:

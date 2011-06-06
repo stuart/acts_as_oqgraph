@@ -177,15 +177,14 @@ Of course YMMV.
 == Hairy bits, bugs and gotchas
 
 To keep the oqgraph table up to date the edge model copies all of it records in when first instantiated.
-This means that if you do not have
-  config.cache_classes = true
-in your environment and you have a lot of nodes your app will be dog slow. Also the app will be slow to start at first if
-there are many nodes even when caches are cached.
+This means that on first startup the app can be slow to respond until the whole graph has been written.
+This should not need to happen again unless the DB is restarted. You can get the MySQL server to update the graph
+by using the --init-file=<SQLfile> option in my.cnf with the appropriate SQL in it.  
 
 I've encountered a bug where the oqgraph table occasionally needs to be dropped and rebuilt. It's being tracked down.
 If you are not getting any results from the oqgrah table try dropping it and restarting the app.
 
-I'm working on a way to tell if the oqgraph table is stale. Suggestions would be welcome.
+I'm working on a way to tell if the oqgraph table is stale other than by the current count of rows. Suggestions would be welcome.
 
 There is a method 'in_edges' in the edge model class. This does not currently work. 'out_edges' does.
 

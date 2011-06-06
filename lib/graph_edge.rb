@@ -6,31 +6,29 @@ class GraphEdge < ActiveRecord::Base
   after_destroy :remove_from_graph
   after_update  :update_graph
   
-  # Creates the OQgraph table if it does not exist.
-  def self.create_graph_table
-        
-      connection.execute <<-EOS
-      CREATE TABLE IF NOT EXISTS #{oqgraph_table_name} (
-          latch   SMALLINT  UNSIGNED NULL,
-          origid  BIGINT    UNSIGNED NULL,
-          destid  BIGINT    UNSIGNED NULL,
-          weight  DOUBLE    NULL,
-          seq     BIGINT    UNSIGNED NULL,
-          linkid  BIGINT    UNSIGNED NULL,
-          KEY (latch, origid, destid) USING HASH,
-          KEY (latch, destid, origid) USING HASH
-        ) ENGINE=OQGRAPH;
-       EOS
+  # Creates the OQgraph table if it does not exist and populate with edges.
+  def self.create_graph_table     
+    connection.execute <<-EOS
+    CREATE TABLE IF NOT EXISTS #{oqgraph_table_name} (
+        latch   SMALLINT  UNSIGNED NULL,
+        origid  BIGINT    UNSIGNED NULL,
+        destid  BIGINT    UNSIGNED NULL,
+        weight  DOUBLE    NULL,
+        seq     BIGINT    UNSIGNED NULL,
+        linkid  BIGINT    UNSIGNED NULL,
+        KEY (latch, origid, destid) USING HASH,
+        KEY (latch, destid, origid) USING HASH
+      ) ENGINE=OQGRAPH;
+    EOS
     
     # if the DB server has restarted then there will be no records in the oqgraph table.
-    if connection.select_value("SELECT COUNT(*) FROM #{oqgraph_table_name}") != connection.select_value("SELECT COUNT(*) FROM #{table_name}")
+    if !up_to_date?
       connection.execute <<-EOS
         REPLACE INTO #{oqgraph_table_name} (origid, destid, weight) 
         SELECT #{from_key}, #{to_key}, #{weight_column} FROM #{table_name}
-        EOS
+      EOS
     end                   
   end   
-  
   
   # Returns the shortest path from node to node.
   # +options+ A hash containing options.
@@ -134,5 +132,9 @@ private
   # Returns the table containing the nodes for these edges.
   def self.node_table
     node_class.table_name
+  end
+  
+  def self.up_to_date?
+    connection.select_value("SELECT COUNT(*) FROM #{oqgraph_table_name}") == connection.select_value("SELECT COUNT(*) FROM #{table_name}")
   end
 end

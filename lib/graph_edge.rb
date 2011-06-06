@@ -23,13 +23,14 @@ class GraphEdge < ActiveRecord::Base
        EOS
     
     # if the DB server has restarted then there will be no records in the oqgraph table.
-    if connection.select_value("SELECT COUNT(*) FROM #{oqgraph_table_name}") == 0
+    if connection.select_value("SELECT COUNT(*) FROM #{oqgraph_table_name}") != connection.select_value("SELECT COUNT(*) FROM #{table_name}")
       connection.execute <<-EOS
         REPLACE INTO #{oqgraph_table_name} (origid, destid, weight) 
         SELECT #{from_key}, #{to_key}, #{weight_column} FROM #{table_name}
         EOS
     end                   
   end   
+  
   
   # Returns the shortest path from node to node.
   # +options+ A hash containing options.

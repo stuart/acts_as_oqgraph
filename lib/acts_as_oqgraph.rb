@@ -127,8 +127,13 @@ module OQGraph
             '#{edge_table_name}'
           end
           
+          def self.rebuild_graph
+            edge_class.create_graph_table
+          end
         EOF
       end      
+      
+
       
       private
       

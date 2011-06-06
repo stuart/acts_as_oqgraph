@@ -229,6 +229,20 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
      assert_nothing_raised do
        edge.destroy
      end
+   end  
+   
+   def test_rebuild_graph
+     @test_1.create_edge_to @test_2
+     @test_2.create_edge_to @test_3
+     @test_3.create_edge_to @test_4
+     # Simulate the DB restart
+     ActiveRecord::Base.connection.execute("DELETE FROM test_model_oqgraph;")
+     TestModel.rebuild_graph
+    
+     assert_equal [@test_1, @test_2, @test_3, @test_4], @test_1.shortest_path_to(@test_4)
+     assert_equal ['a','b','c','d'], @test_1.shortest_path_to(@test_4).map(&:name)
+   
    end
+   
    
 end

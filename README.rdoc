@@ -150,8 +150,9 @@ The OQGraph table will also get created if it does not exist. The OQGraph table 
 memory only. The table structure is not volatile and gets stored in the db. 
 When your application starts up it will put all the edges into the graph table and update them as
 they are created, deleted or modified. This could slow things down at startup but caching classes in production
-means it does not happen on every request. I will add functionality to only update the oqgraph table if the 
-db server has been stopped, once I figure out the best way to do it.
+means it does not happen on every request. The graph table is only rewritten now when the DB has been restarted.
+You can use this code to force the graph to be rebuilt:
+  NodeModel.rebuild_graph
 
 == How fast is it?
 I've tested with an application with 10000 nodes and 0 to 9 links from each.

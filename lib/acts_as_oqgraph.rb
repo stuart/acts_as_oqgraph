@@ -142,8 +142,8 @@ module OQGraph
         begin
           result = false
           engines = self.connection.execute("SHOW ENGINES")
-          engines.each_hash do |engine|
-            result = true if (engine["Engine"]=="OQGRAPH" and engine["Support"]=="YES")
+          engines.each do |engine|
+            result = true if (engine[0]=="OQGRAPH" and engine[1]=="YES")
           end
           return result
         rescue ActiveRecord::StatementInvalid => e

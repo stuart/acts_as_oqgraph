@@ -3,7 +3,7 @@ require 'helper'
 class TestActsAsOqgraph < ActiveSupport::TestCase
   def setup
     ActiveRecord::Base.establish_connection(
-        :adapter  => "mysql",
+        :adapter  => "mysql2",
         :host     => "localhost",
         :username => "root",
         :password => "",
@@ -103,7 +103,7 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
   def test_edge_model_creation_creates_oqgraph_edge
     @test_1.create_edge_to(@test_2, 2.5)
     oqedge = ActiveRecord::Base.connection.execute("SELECT * FROM test_model_oqgraph WHERE origid=#{@test_1.id} AND destid=#{@test_2.id};")
-    assert_equal [nil,"1","2","2.5",nil,nil], oqedge.fetch_row                                      
+    assert_equal [nil,1,2,2.5,nil,nil], oqedge.first                                      
   end
   
   def test_edge_model_removal_deletes_oqgraph_edge
@@ -111,17 +111,17 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
     edge = @test_1.outgoing_edges.find(:first, :conditions => {:to_id => @test_2.id})
     edge.destroy
     oqedge = ActiveRecord::Base.connection.execute("SELECT * FROM test_model_oqgraph WHERE origid=#{@test_1.id} AND destid=#{@test_2.id};")
-    assert_equal nil, oqedge.fetch_row
+    assert_equal nil, oqedge.first
   end
   
   def test_edge_model_update
     edge = @test_1.create_edge_to(@test_2, 2.5) 
     edge.update_attributes(:weight => 3.0)
     oqedge = ActiveRecord::Base.connection.execute("SELECT * FROM test_model_oqgraph WHERE origid=#{@test_1.id} AND destid=#{@test_2.id};") 
-    assert_equal [nil,"1","2","3",nil,nil], oqedge.fetch_row
+    assert_equal [nil,1,2,3,nil,nil], oqedge.first
     edge.update_attributes(:to_id => 3)
     oqedge = ActiveRecord::Base.connection.execute("SELECT * FROM test_model_oqgraph WHERE origid=#{@test_1.id} AND destid=3;") 
-    assert_equal [nil,"1","3","3",nil,nil], oqedge.fetch_row
+    assert_equal [nil,1,3,3,nil,nil], oqedge.first
   end
   
   def test_gettting_the_shortest_path 

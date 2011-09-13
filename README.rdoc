@@ -176,10 +176,10 @@ Of course YMMV.
 
 == Compatability
 
-Version numbers starting with 1 use the mysql gem.
+Versions < 1.0.0 use the mysql gem.
 
 For compatability with Rails 3: 
-Version numbers starting with 2 use the mysql2 gem.
+Versions >= 1.0.0 use the mysql2 gem.
 
 == Hairy bits, bugs and gotchas
 

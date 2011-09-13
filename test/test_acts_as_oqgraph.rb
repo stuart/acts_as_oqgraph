@@ -152,7 +152,7 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
     @test_1.create_edge_to @test_2, 2.0
     @test_2.create_edge_to @test_3, 1.5
     @test_3.create_edge_to @test_4, 1.2
-    assert_equal [nil,"2","1.5","1.2"], @test_1.shortest_path_to(@test_4).map(&:weight)
+    assert_equal [nil, 2.0 ,1.5, 1.2], @test_1.shortest_path_to(@test_4).map(&:weight)
   end
   
   def test_path_weight
@@ -241,7 +241,6 @@ class TestActsAsOqgraph < ActiveSupport::TestCase
     
      assert_equal [@test_1, @test_2, @test_3, @test_4], @test_1.shortest_path_to(@test_4)
      assert_equal ['a','b','c','d'], @test_1.shortest_path_to(@test_4).map(&:name)
-   
    end
    
    

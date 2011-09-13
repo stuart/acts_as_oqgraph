@@ -133,10 +133,8 @@ module OQGraph
             edge_class.create_graph_table
           end
         EOF
-      end      
-      
+      end
 
-      
       private
       
       # Check that we have the OQGraph engine plugin installed in MySQL

@@ -1,6 +1,5 @@
 require 'active_record'
 require File.join(File.dirname(__FILE__),'graph_edge')
-require 'mysql'
 
 module OQGraph
   def self.included(base)
